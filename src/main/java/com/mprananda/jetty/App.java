@@ -1,5 +1,7 @@
 package com.mprananda.jetty;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.plus.webapp.EnvConfiguration;
 import org.eclipse.jetty.plus.webapp.PlusConfiguration;
@@ -7,6 +9,7 @@ import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.resource.Resource;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.webapp.*;
 
 import java.io.File;
@@ -24,22 +27,31 @@ public class App
 {
     private Server server;
     private static final int PORT = 8080;
+    private static Logger logger = LogManager.getLogger(App.class);
 
     private void start() throws Exception {
-        server = new Server();
+        server = new Server(createThreadPool());
         ServerConnector connector = new ServerConnector(server);
         connector.setPort(PORT);
         server.setConnectors(new Connector[] {connector});
 
         server.setHandler(getWebAppContext());
         server.start();
-        server.dump(System.err);
+        server.dump(System.out);
         server.join();
+    }
+
+    private QueuedThreadPool createThreadPool() {
+        int maxThreads = 100;
+        int minThreads = 10;
+        int idleTimeout = 120;
+
+        return new QueuedThreadPool(maxThreads, minThreads, idleTimeout);
     }
 
     private WebAppContext getWebAppContext() throws MalformedURLException {
         URI webResourceBase = findWebResourceBase(server.getClass().getClassLoader());
-        System.err.println("Using BaseResource: " + webResourceBase);
+        logger.info("Using BaseResource: {}", webResourceBase);
         WebAppContext context = new WebAppContext();
         context.setBaseResource(Resource.newResource(webResourceBase));
         context.setConfigurations(new Configuration[]
@@ -70,7 +82,7 @@ public class App
             if (webXml != null)
             {
                 URI uri = webXml.toURI().resolve("..").normalize();
-                System.err.printf("WebResourceBase (Using ClassLoader reference) %s%n", uri);
+                logger.info("WebResourceBase (Using ClassLoader reference) {}", uri);
                 return uri;
             }
         }
@@ -99,7 +111,7 @@ public class App
                         if(Files.exists(possible))
                         {
                             URI uri = path.toUri();
-                            System.err.printf("WebResourceBase (Using discovered /target/ Path) %s%n", uri);
+                            logger.info("WebResourceBase (Using discovered /target/ Path) {}", uri);
                             return uri;
                         }
                     }
@@ -111,7 +123,7 @@ public class App
             if(Files.exists(srcWebapp))
             {
                 URI uri = srcWebapp.getParent().toUri();
-                System.err.printf("WebResourceBase (Using /src/main/webapp/ Path) %s%n", uri);
+                logger.info("WebResourceBase (Using /src/main/webapp/ Path) {}", uri);
                 return uri;
             }
         }
@@ -129,7 +141,7 @@ public class App
         try {
             app.start();
         } catch (Exception ex) {
-            System.err.println(ex);
+            logger.error(ex);
         }
     }
 }
