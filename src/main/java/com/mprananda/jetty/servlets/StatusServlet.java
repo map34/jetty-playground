@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.eclipse.jetty.util.Jetty;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletOutputStream;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 
 @SuppressWarnings("serial")
 @WebServlet(name="StatusServlet", urlPatterns = {"/status"}, asyncSupported = true)
@@ -52,6 +54,8 @@ public class StatusServlet extends HttpServlet {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode rootNode = mapper.createObjectNode();
         ((ObjectNode) rootNode).put("status", "OK");
+        ((ObjectNode) rootNode).put("time", (new Date()).toInstant().toString());
+        ((ObjectNode) rootNode).put("jettyVersion", Jetty.VERSION);
         return mapper.writeValueAsString(rootNode);
     }
 }
