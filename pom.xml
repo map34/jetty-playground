@@ -5,23 +5,44 @@
     <artifactId>jetty-playground</artifactId>
     <packaging>war</packaging>
     <version>1.0-SNAPSHOT</version>
+    <properties>
+        <jetty-version>9.4.26.v20200117</jetty-version>
+        <log4j-version>2.13.2</log4j-version>
+    </properties>
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>9</source>
-                    <target>9</target>
+                    <source>14</source>
+                    <target>14</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals><goal>copy</goal></goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.eclipse.jetty</groupId>
+                                    <artifactId>jetty-runner</artifactId>
+                                    <version>${jetty-version}</version>
+                                    <destFileName>jetty-runner.jar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
     <name>jetty-playground</name>
     <url>http://maven.apache.org</url>
-    <properties>
-        <jetty-version>9.4.26.v20200117</jetty-version>
-    </properties>
     <dependencies>
         <!-- JETTY -->
         <dependency>
@@ -48,12 +69,12 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-            <version>2.13.2</version>
+            <version>${log4j-version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.13.2</version>
+            <version>${log4j-version}</version>
         </dependency>
         <!-- JACKSON -->
         <dependency>
