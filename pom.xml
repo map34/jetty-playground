@@ -6,7 +6,7 @@
     <packaging>war</packaging>
     <version>1.0-SNAPSHOT</version>
     <properties>
-        <jetty-version>9.4.26.v20200117</jetty-version>
+        <jetty-version>9.4.41.v20210516</jetty-version>
         <log4j-version>2.13.2</log4j-version>
     </properties>
     <build>
